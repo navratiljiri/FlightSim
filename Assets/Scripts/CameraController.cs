@@ -12,6 +12,7 @@ public class CameraController : MonoBehaviour
     [SerializeField] private Transform target;
     [Tooltip("Vzdálenost od cíle")]
     [SerializeField] private float distance = 10f;
+    [SerializeField] private PauseMenu pauseMenu;
 
     private int index = 1;
     private bool isRotating = false;
@@ -53,31 +54,34 @@ public class CameraController : MonoBehaviour
 
     private void HandleMouseRotation()
     {
-        if (Input.GetMouseButtonDown(0)) // Levé tlaèítko myši pro aktivaci rotace
+        if(!pauseMenu.isPaused)
         {
-            previousPosition = Input.mousePosition;
-            isRotating = true;
-        }
+            if (Input.GetMouseButtonDown(0))
+            {
+                previousPosition = Input.mousePosition;
+                isRotating = true;
+            }
 
-        if (Input.GetMouseButton(0))
-        {
-            Vector3 direction = previousPosition - Input.mousePosition;
+            if (Input.GetMouseButton(0))
+            {
+                Vector3 direction = previousPosition - Input.mousePosition;
 
-            currentX += direction.x * rotationSpeed * 0.1f;
-            currentY += direction.y * rotationSpeed * 0.1f;
-            currentY = Mathf.Clamp(currentY, 5f, 80f); // Omezení vertikální rotace
+                currentX += direction.x * rotationSpeed * 0.1f;
+                currentY += direction.y * rotationSpeed * 0.1f;
+                currentY = Mathf.Clamp(currentY, 5f, 80f); // Omezení vertikální rotace
 
-            previousPosition = Input.mousePosition;
-        }
+                previousPosition = Input.mousePosition;
+            }
 
-        if (Input.GetMouseButtonUp(0))
-        {
-            isRotating = false;
-        }
+            if (Input.GetMouseButtonUp(0))
+            {
+                isRotating = false;
+            }
 
-        if (isRotating)
-        {
-            UpdateCameraOrbit();
+            if (isRotating)
+            {
+                UpdateCameraOrbit();
+            }
         }
     }
 
@@ -85,7 +89,7 @@ public class CameraController : MonoBehaviour
     {
         // Výpoèet nové pozice kamery kolem cíle
         Quaternion rotation = Quaternion.Euler(currentY, currentX, 0);
-        Vector3 direction = new Vector3(0, 0, -distance);
+        Vector3 direction = new Vector3(0, 0, -distance * 3);
         transform.position = target.position + rotation * direction;
         transform.LookAt(target);
     }
